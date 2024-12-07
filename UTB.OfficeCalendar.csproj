@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>86bf4095-d23a-4101-8795-c79cfa1b84e8</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UTB.OfficeCalendar.Application\UTB.OfficeCalendar.Application.csproj" />
+    <ProjectReference Include="..\UTB.OfficeCalendar.Domain\UTB.OfficeCalendar.Domain.csproj" />
+    <ProjectReference Include="..\UTB.OfficeCalendar.Infrastructure\UTB.OfficeCalendar.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
