@@ -8,35 +8,25 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
-    <style>
-        body {
-            margin: 0;
-            background-color: black;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-        }
+    <link rel="stylesheet" href="~/css/login.css" />
+    <script>
+        function login() {
+            const name = document.getElementById("nameInput").value.trim();
 
-        button {
-            background-color: #666;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-            button:hover {
-                background-color: #444;
+            if (name === "Admin") {
+                window.location.href = "/Admin/AdminCalendar/AdminShared";
+            } else if (name === "User") {
+                window.location.href = "/User/Calendar/CalendarDay";
+            } else {
+                alert("Invalid name. Please enter 'Admin' or 'User'.");
             }
-    </style>
+        }
+    </script>
 </head>
 <body>
-    <button onclick="location.href='/User/Calendar/CalendarDay'">Go to Daily View</button>
-
+    <form onsubmit="event.preventDefault(); login();">
+        <input type="text" id="nameInput" placeholder="Name" required />
+        <button type="submit">Login</button>
+    </form>
 </body>
 </html>

@@ -22,6 +22,14 @@
         <a href="/User/Calendar/CalendarDay">Denní kalendář</a>
         <a href="/User/Calendar/SharedCalendar">Sdílený kalendář</a>
         <a href="/User/Profile/Profile">Profil</a>
+        <!-- Admin Menu -->
+        @if (User.IsInRole("Admin"))
+        {
+            <h2>Admin zóna</h2>
+            <a href="/Admin/Calendar/AdminMonth">Měsíční kalendář</a>
+            <a href="/Admin/Calendar/AdminShared">Sdílený kalendář</a>
+            <a href="/Admin/User/CreateUser">Vytvořit uživatele</a>
+        }
     </aside>
     <section class="content">
         @RenderBody()
