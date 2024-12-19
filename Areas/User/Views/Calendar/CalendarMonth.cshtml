@@ -18,8 +18,9 @@
             const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
             const daysInMonth = lastDay.getDate();
 
-            const startDayOfWeek = firstDay.getDay(); // Sunday = 0, Monday = 1, ...
-            const totalDays = 35; // Always 5 rows (35 days total)
+            // Adjust start day to make Monday = 0
+            const startDayOfWeek = (firstDay.getDay() + 6) % 7; // Convert Sunday (0) to 6 and shift other days accordingly
+            const totalDays = 42; // Always 6 rows (42 days total for uniform grid)
             calendarGrid.innerHTML = "";
 
             // Update displayed month/year
@@ -85,13 +86,13 @@
 
     <!-- Day Shortcuts -->
     <div class="day-shortcuts">
-        <span>Ne</span>
         <span>Po</span>
         <span>Út</span>
         <span>St</span>
         <span>Čt</span>
         <span>Pá</span>
         <span>So</span>
+        <span>Ne</span>
     </div>
 
     <!-- Calendar Grid -->
