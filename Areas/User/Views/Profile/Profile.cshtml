@@ -3,5 +3,71 @@
     ViewData["Title"] = "Profil";
 }
 
-<h1>Profil</h1>
-<p>ProfilProfilProfilProfilProfilProfilProfilProfilProfilProfilProfilProfil</p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css">
+}
+
+<div class="profile-container">
+    <!-- Title -->
+    <div class="title-bar">
+        <h1>Profil</h1>
+        <hr />
+    </div>
+
+    <!-- Profile Section -->
+    <div class="profile-section">
+        <div class="profile-row">
+            <span class="profile-label">Jméno:</span>
+            <span class="profile-value">----</span>
+        </div>
+        <div class="profile-row">
+            <span class="profile-label">Příjmení:</span>
+            <span class="profile-value">----</span>
+        </div>
+        <div class="profile-row">
+            <span class="profile-label">Role:</span>
+            <span class="profile-value">----</span>
+        </div>
+        <div class="profile-row">
+            <span class="profile-label">Hodinová sazba:</span>
+            <span class="profile-value">----</span>
+        </div>
+        <div class="profile-row">
+            <span class="profile-label">Plat za tento měsíc:</span>
+            <span class="profile-value">----</span>
+        </div>
+    </div>
+
+    <!-- Editable Section -->
+    <div class="editable-section">
+        <div class="editable-row">
+            <label class="editable-label" for="profile-picture">Profilová fotka:</label>
+            <input type="file" id="profile-picture" class="editable-input">
+        </div>
+        <div class="editable-row">
+            <label class="editable-label" for="email">Email:</label>
+            <input type="text" id="email" class="editable-input" placeholder="----">
+        </div>
+        <div class="editable-row">
+            <label class="editable-label" for="address">Adresa:</label>
+            <input type="text" id="address" class="editable-input" placeholder="----">
+        </div>
+        <div class="editable-row">
+            <label class="editable-label" for="phone">Telefonní číslo:</label>
+            <input type="text" id="phone" class="editable-input" placeholder="----">
+        </div>
+        <div class="editable-row">
+            <label class="editable-label" for="languages">Jazyky:</label>
+            <textarea id="languages" class="editable-textarea" placeholder="----"></textarea>
+        </div>
+        <div class="editable-row">
+            <label class="editable-label" for="skills">Schopnosti:</label>
+            <textarea id="skills" class="editable-textarea" placeholder="----"></textarea>
+        </div>
+    </div>
+
+    <!-- Action Section -->
+    <div class="action-section">
+        <button class="save-btn">Uložit změny</button>
+    </div>
+</div>

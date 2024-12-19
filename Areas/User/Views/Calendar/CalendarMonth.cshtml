@@ -3,5 +3,107 @@
     ViewData["Title"] = "Měsíční kalendář";
 }
 
-<h1>Měsíční kalendář</h1>
-<p>Měsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendář</p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/calendarmonth.css">
+}
+
+@section Scripts {
+    <script>
+        const currentMonthYear = document.getElementById('currentMonthYear');
+        const calendarGrid = document.getElementById('calendarGrid');
+        let currentDate = new Date();
+
+        function renderCalendar() {
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            const daysInMonth = lastDay.getDate();
+
+            const startDayOfWeek = firstDay.getDay(); // Sunday = 0, Monday = 1, ...
+            const totalDays = 35; // Always 5 rows (35 days total)
+            calendarGrid.innerHTML = "";
+
+            // Update displayed month/year
+            currentMonthYear.textContent = currentDate.toLocaleDateString('cs-CZ', {
+                month: 'long',
+                year: 'numeric'
+            });
+
+            // Render calendar
+            for (let i = 0; i < totalDays; i++) {
+                const day = i - startDayOfWeek + 1;
+                const isCurrentMonth = day > 0 && day <= daysInMonth;
+
+                const button = document.createElement('button');
+                button.className = isCurrentMonth ? 'day-button current-month' : 'day-button overflow-month';
+                button.textContent = isCurrentMonth ? day : (day <= 0 ? day + daysInMonth : day - daysInMonth);
+                button.onclick = () => openPopup(button.textContent);
+
+                calendarGrid.appendChild(button);
+            }
+        }
+
+        function openPopup(day) {
+            const popup = document.getElementById('popup');
+            const popupDay = document.getElementById('popupDay');
+            popupDay.textContent = `Den: ${day}`;
+            popup.style.display = 'flex';
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('popup');
+            popup.style.display = 'none';
+        }
+
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        // Initialize calendar
+        document.addEventListener('DOMContentLoaded', renderCalendar);
+    </script>
+}
+
+<div class="calendar-container">
+    <!-- Title -->
+    <div class="title-bar">
+        <h1>Měsíční kalendář</h1>
+        <hr />
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <button class="nav-button" onclick="prevMonth()">&larr;</button>
+        <span id="currentMonthYear"></span>
+        <button class="nav-button" onclick="nextMonth()">&rarr;</button>
+    </div>
+
+    <!-- Day Shortcuts -->
+    <div class="day-shortcuts">
+        <span>Ne</span>
+        <span>Po</span>
+        <span>Út</span>
+        <span>St</span>
+        <span>Čt</span>
+        <span>Pá</span>
+        <span>So</span>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div id="calendarGrid" class="calendar-grid"></div>
+</div>
+
+<!-- Popup -->
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <p id="popupDay"></p>
+        <button class="popup-button" onclick="closePopup()">I want to work</button>
+        <button class="popup-button" onclick="closePopup()">I can't work</button>
+        <button class="popup-button close" onclick="closePopup()">Close</button>
+    </div>
+</div>

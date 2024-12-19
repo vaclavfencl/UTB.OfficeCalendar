@@ -3,5 +3,78 @@
     ViewData["Title"] = "Denní kalendář";
 }
 
-<h1>Denní kalendář</h1>
-<p>Denní kalendářDenní kalendářDenní kalendářDenní kalendářDenní kalendářDenní kalendářDenní kalendářDenní kalendářDenní kalendářDenní kalendář</p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/calendarday.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"> <!-- Flatpickr -->
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> <!-- Flatpickr -->
+    <script>
+        const currentDateElement = document.getElementById('currentDate');
+        const datePicker = document.getElementById('datePicker');
+        let currentDate = new Date();
+
+        function updateDateDisplay() {
+            currentDateElement.textContent = currentDate.toLocaleDateString('cs-CZ', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function openCalendar() {
+            flatpickr(datePicker, {
+                defaultDate: currentDate,
+                onChange: function (selectedDates) {
+                    if (selectedDates.length > 0) {
+                        currentDate = selectedDates[0];
+                        updateDateDisplay();
+                    }
+                }
+            }).open();
+        }
+
+        function prevDay() {
+            currentDate.setDate(currentDate.getDate() - 1);
+            updateDateDisplay();
+        }
+
+        function nextDay() {
+            currentDate.setDate(currentDate.getDate() + 1);
+            updateDateDisplay();
+        }
+
+        document.addEventListener("DOMContentLoaded", updateDateDisplay);
+    </script>
+}
+
+<div class="calendar-container">
+    <!-- Title -->
+    <div class="title-bar">
+        <h1>Denní kalendář</h1>
+        <hr />
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <button class="nav-button" onclick="prevDay()">&larr;</button>
+        <span id="currentDate" onclick="openCalendar()">Den měsíc rok</span>
+        <input id="datePicker" type="text" style="display: none;" />
+        <button class="nav-button" onclick="nextDay()">&rarr;</button>
+    </div>
+
+    <!-- Event Table -->
+    <div class="event-table">
+        <div class="header-row">
+            <span class="header-cell">Datum</span>
+            <span class="header-cell">Čas</span>
+            <span class="header-cell">Detail</span>
+        </div>
+        <div class="event-row">
+            <span class="event-cell">Práce</span>
+            <span class="event-cell">17:00</span>
+            <span class="event-cell">Pracující práce pro pracanta</span>
+        </div>
+    </div>
+</div>

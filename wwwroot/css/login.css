@@ -16,7 +16,7 @@ form {
     align-items: center;
 }
 
-input[type="text"] {
+input {
     margin-bottom: 20px;
     padding: 10px;
     font-size: 18px;

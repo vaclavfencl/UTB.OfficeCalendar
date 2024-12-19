@@ -1,7 +1,94 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml"; // Reference to the shared layout
-    ViewData["Title"] = "Měsíční kalendář";
+    ViewData["Title"] = "Admin - Měsíční přehled";
 }
 
-<h1>ADMIN Měsíční kalendář</h1>
-<p>Měsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendářMěsíční kalendář</p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/adminmonth.css">
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script>
+        const currentDateElement = document.getElementById('currentDate');
+        const datePicker = document.getElementById('datePicker');
+        let currentDate = new Date();
+
+        function updateDateDisplay() {
+            currentDateElement.textContent = currentDate.toLocaleDateString('cs-CZ', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function openCalendar() {
+            flatpickr("#datePicker", {
+                defaultDate: currentDate,
+                onChange: function (selectedDates) {
+                    if (selectedDates.length > 0) {
+                        currentDate = selectedDates[0];
+                        updateDateDisplay();
+                    }
+                }
+            }).open();
+        }
+
+        function prevDay() {
+            currentDate.setDate(currentDate.getDate() - 1);
+            updateDateDisplay();
+        }
+
+        function nextDay() {
+            currentDate.setDate(currentDate.getDate() + 1);
+            updateDateDisplay();
+        }
+
+        document.addEventListener("DOMContentLoaded", updateDateDisplay);
+    </script>
+}
+
+<div class="calendar-container">
+    <!-- Title -->
+    <div class="title-bar">
+        <h1>Admin - Měsíční přehled</h1>
+        <hr />
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <button class="nav-button" onclick="prevDay()">&larr;</button>
+        <span id="currentDate" onclick="openCalendar()">19. prosince 2024</span>
+        <input id="datePicker" type="text" style="display: none;" />
+        <button class="nav-button" onclick="nextDay()">&rarr;</button>
+    </div>
+
+    <!-- Request Table -->
+    <div class="request-table">
+        <!-- Table Header -->
+        <div class="table-row header">
+            <span class="table-cell">Jméno</span>
+            <span class="table-cell">Stav</span>
+            <span class="table-cell action-header">Akce</span>
+        </div>
+
+        <!-- Table Rows -->
+        <div class="table-row">
+            <span class="table-cell">Jan Novák</span>
+            <span class="table-cell">Chce pracovat</span>
+            <span class="table-cell action-cell">
+                <button class="accept-btn">✔</button>
+                <button class="deny-btn">✖</button>
+            </span>
+        </div>
+        <div class="table-row">
+            <span class="table-cell">Petra Dvořáková</span>
+            <span class="table-cell">Nechce pracovat</span>
+            <span class="table-cell action-cell">
+                <button class="accept-btn">✔</button>
+                <button class="deny-btn">✖</button>
+            </span>
+        </div>
+    </div>
+</div>

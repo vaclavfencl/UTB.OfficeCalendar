@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/layout.css" />
+
+    <!-- Render the Styles section if defined -->
+    @RenderSection("Styles", required: false)
 </head>
 <body>
     <aside class="sidebar">
@@ -18,22 +21,25 @@
         </div>
         <!-- Navigation Links -->
         <h2>Tvůj účet</h2>
-        <a href="/User/Calendar/CalendarMonth">Měsíční kalendář</a>
-        <a href="/User/Calendar/CalendarDay">Denní kalendář</a>
-        <a href="/User/Calendar/SharedCalendar">Sdílený kalendář</a>
-        <a href="/User/Profile/Profile">Profil</a>
+        <a asp-area="User" asp-controller="Calendar" asp-action="CalendarMonth">Měsíční kalendář</a>
+        <a asp-area="User" asp-controller="Calendar" asp-action="CalendarDay">Denní kalendář</a>
+        <a asp-area="User" asp-controller="Calendar" asp-action="SharedCalendar">Sdílený kalendář</a>
+        <a asp-area="User" asp-controller="Profile" asp-action="Profile">Profil</a>
         <!-- Admin Menu -->
         @* @if (User.IsInRole("Admin")) { *@
-            <h2>Admin zóna</h2>
-            <a href="/Admin/AdminCalendar/AdminMonth">Měsíční kalendář</a>
-            <a href="/Admin/AdminCalendar/AdminShared">Sdílený kalendář</a>
-            <a href="/Admin/User/CreateUser">Vytvořit uživatele</a>
-
+        <h2>Admin zóna</h2>
+        <a asp-area="Admin" asp-controller="AdminCalendar" asp-action="AdminMonth">Měsíční kalendář</a>
+        <a asp-area="User" asp-controller="Calendar" asp-action="SharedCalendar">Sdílený kalendář</a>
+        @* <a asp-area="Admin" asp-controller="AdminCalendar" asp-action="AdminShared">Sdílený kalendář</a> *@
+        <a asp-area="Admin" asp-controller="User" asp-action="CreateUser">Vytvořit uživatele</a>
         @* } *@
         <button class="logout-button" onclick="location.href='/'">Logout</button>
     </aside>
     <section class="content">
         @RenderBody()
     </section>
+
+    <!-- Render the Scripts section if defined -->
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

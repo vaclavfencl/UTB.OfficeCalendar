@@ -1,0 +1,141 @@
+﻿body {
+    background-color: #000; /* Black background */
+    color: #fff; /* White text */
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.calendar-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Title Bar */
+.title-bar {
+    text-align: left;
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+    .title-bar hr {
+        border: none;
+        border-top: 2px solid #fff;
+        margin-top: 10px;
+    }
+
+/* Navigation Bar */
+.nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.nav-button {
+    background-color: #333;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+    .nav-button:hover {
+        background-color: #555;
+    }
+
+/* Day Shortcuts */
+.day-shortcuts {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+    .day-shortcuts span {
+        padding: 5px;
+    }
+
+/* Calendar Grid */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.day-button {
+    background-color: #444;
+    color: #fff;
+    padding: 20px;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+    .day-button.current-month {
+        background-color: #555;
+    }
+
+    .day-button.overflow-month {
+        background-color: #333;
+        color: #aaa;
+    }
+
+    .day-button:hover {
+        background-color: #666;
+    }
+
+/* Popup */
+.popup {
+    position: fixed; /* Ensure the popup stays in the viewport */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust for the element's own dimensions */
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8); /* Dark semi-transparent background */
+    z-index: 1000; /* Ensure it stays above other elements */
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 300px;
+    width: 100%;
+    color: #fff;
+    text-align: center;
+}
+
+/* Popup Content */
+.popup-content {
+    background-color: #222; /* Dark background for the content */
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 300px;
+    width: 100%;
+}
+
+.popup-button {
+    background-color: #444;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    margin: 10px 0; /* Space between buttons */
+    cursor: pointer;
+    width: 100%;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+    .popup-button:hover {
+        background-color: #666;
+    }
+
+    .popup-button.close {
+        background-color: #222; /* Slightly darker for the close button */
+    }

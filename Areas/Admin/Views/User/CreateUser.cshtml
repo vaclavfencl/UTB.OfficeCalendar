@@ -1,7 +1,49 @@
 ﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml"; // Reference to the shared layout
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Vytvořit uživatele";
 }
 
-<h1>ADMIN Vytvořit uživatele</h1>
-<p>Vytvořit uživateleVytvořit uživateleVytvořit uživateleVytvořit uživateleVytvořit uživateleVytvořit uživateleVytvořit uživateleVytvořit uživateleVytvořit uživateleVytvořit uživateleVytvořit uživatele</p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/createuser.css">
+}
+
+<div class="main-content">
+    <div class="create-user-container">
+        <!-- Title -->
+        <div class="title-bar">
+            <h1>Vytvořit uživatele</h1>
+            <hr />
+        </div>
+
+        <!-- Create User Form -->
+        <form method="post" action="/Admin/CreateUser">
+            <div class="form-section">
+                <div class="form-row">
+                    <label class="form-label" for="name">Jméno <span class="mandatory">*</span>:</label>
+                    <input type="text" id="name" name="name" class="form-input" required>
+                </div>
+                <div class="form-row">
+                    <label class="form-label" for="surname">Příjmení <span class="mandatory">*</span>:</label>
+                    <input type="text" id="surname" name="surname" class="form-input" required>
+                </div>
+                <div class="form-row">
+                    <label class="form-label" for="email">Email <span class="mandatory">*</span>:</label>
+                    <input type="email" id="email" name="email" class="form-input" required>
+                </div>
+                <div class="form-row">
+                    <label class="form-label" for="address">Adresa <span class="mandatory">*</span>:</label>
+                    <input type="text" id="address" name="address" class="form-input" required>
+                </div>
+                <div class="form-row">
+                    <label class="form-label" for="phone">Telefonní číslo <span class="mandatory">*</span>:</label>
+                    <input type="text" id="phone" name="phone" class="form-input" required>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-section">
+                <button type="submit" class="submit-btn">Vytvořit uživatele</button>
+            </div>
+        </form>
+    </div>
+</div>
