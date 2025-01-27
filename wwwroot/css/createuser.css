@@ -5,13 +5,9 @@ body {
     color: #fff;
     background-color: #000; /* Black background */
     display: flex;
-    height: 100vh; /* Full viewport height */
-    overflow: hidden; /* Prevent scrolling on the body */
 }
 
 .main-content {
-    flex: 1;
-    overflow-y: auto; /* Enable scrolling for the main content */
     padding: 20px;
     box-sizing: border-box;
 }

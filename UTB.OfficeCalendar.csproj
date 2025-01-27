@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,6 +23,10 @@
     <ProjectReference Include="..\UTB.OfficeCalendar.Application\UTB.OfficeCalendar.Application.csproj" />
     <ProjectReference Include="..\UTB.OfficeCalendar.Domain\UTB.OfficeCalendar.Domain.csproj" />
     <ProjectReference Include="..\UTB.OfficeCalendar.Infrastructure\UTB.OfficeCalendar.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\img\" />
   </ItemGroup>
 
 </Project>

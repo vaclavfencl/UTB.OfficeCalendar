@@ -1,0 +1,131 @@
+﻿body {
+    background-color: #000;
+    color: #fff;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.list-user-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Title Bar */
+.title-bar {
+    text-align: center;
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+    .title-bar hr {
+        text-align: center;
+        width:75%;
+        border: none;
+        border-top: 2px solid #fff;
+        margin-top: 10px;
+    }
+
+/* Success and Error Messages */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    background-color: #28a745;
+    color: #fff;
+    border-color: #28a745;
+}
+
+.alert-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border-color: #dc3545;
+}
+
+/* Table Styling */
+.table {
+    width: 75%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    align-self: center;
+}
+
+.table-striped thead {
+    background-color: #555;
+    color: #fff;
+}
+
+.table-striped th {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #fff;
+    font-weight: bold;
+}
+
+.table-striped tbody tr:nth-child(odd) {
+    background-color: #333;
+}
+
+.table-striped tbody tr:nth-child(even) {
+    background-color: #444;
+}
+
+.table-striped td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #555;
+}
+
+/* Dropdown and Buttons */
+.form-select {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #fff;
+    padding: 5px;
+    font-size: 1em;
+    border-radius: 4px;
+}
+
+    .form-select:hover {
+        background-color: #555;
+    }
+
+.btn {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #fff;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 1em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+    .btn:hover {
+        background-color: #555;
+    }
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }

@@ -1,70 +1,112 @@
 ﻿/* General Styling */
 body {
     background-color: #000; /* Black background */
-    color: #fff; /* White text */
     margin: 0;
     font-family: Arial, sans-serif;
-    height: 100%;
-}
-
-html, body {
-    overflow-y: auto; /* Allow scrolling */
+    color: #fff;
 }
 
 .profile-container {
     padding: 20px;
     max-width: 800px;
     margin: 0 auto;
-    box-sizing: border-box;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 /* Title Bar */
 .title-bar {
-    text-align: left;
+    display: flex;
+    align-items: center;
     font-size: 2.5em;
     font-weight: bold;
     margin-bottom: 20px;
+    flex-direction: column; /* Stack title and line */
 }
 
-    .title-bar hr {
-        border: none;
-        border-top: 2px solid #fff;
-        margin-top: 10px;
-    }
+/* Ensures the line is BELOW everything */
+.title-bar hr {
+    border: none;
+    border-top: 2px solid #fff;
+    margin-top: 10px;
+    width: 100%;
+}
 
-/* Profile Information Section */
+/* Profile Picture + Delete Button */
+.profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Align items in a row */
+    gap: 15px;
+}
+
+/* Profile Picture */
+.profile-img-page {
+    width: 100px; /* Smaller Picture */
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+}
+
+/* Delete Button */
+.delete-btn {
+    background-color: #ff4d4d; /* Red */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.1s ease-in-out;
+}
+
+.delete-btn:hover {
+    background-color: #cc0000;
+}
+
+.delete-btn:active {
+    background-color: #a00000;
+    transform: scale(0.95);
+}
+
+/* Profile Section */
 .profile-section {
     margin-bottom: 20px;
-    border-bottom: 1px solid #444;
-    padding-bottom: 20px;
 }
 
 .profile-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
 }
 
 .profile-label {
     font-weight: bold;
-    width: 40%;
+    font-size: 1.2em;
+    width: 30%;
 }
 
 .profile-value {
-    width: 60%;
-    text-align: right;
-    color: #aaa; /* Light grey for static fields */
+    font-size: 1.2em;
+    width: 70%;
 }
 
 /* Editable Section */
 .editable-section {
-    margin-bottom: 20px;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #444;
+    border-radius: 10px;
+    border: 1px solid #000;
 }
 
 .editable-row {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
 }
 
@@ -73,19 +115,18 @@ html, body {
     width: 40%;
 }
 
-.editable-input,
-.editable-textarea {
-    width: 60%;
+.editable-input {
+    width: 55%;
     padding: 10px;
     border: 1px solid #444;
     border-radius: 5px;
-    background-color: #222;
-    color: #fff;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.editable-textarea {
-    resize: none;
-    height: 100px;
+.editable-input:focus {
+    background-color: #555;
+    border-color: #4CAF50; /* Green focus border */
+    outline: none;
 }
 
 /* Action Section */
@@ -102,21 +143,14 @@ html, body {
     cursor: pointer;
     font-size: 1.2em;
     border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.1s ease-in-out;
 }
 
-    .save-btn:hover {
-        background-color: #45a049;
-    }
-
-/* Adjust Layout for Scrolling */
-.main-content {
-    height: calc(100vh - 40px); /* Dynamically calculate content height */
-    overflow-y: auto; /* Enable scrolling */
+.save-btn:hover {
+    background-color: #45a049;
 }
 
-.profile-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%; /* Ensure it fills available space */
-    box-sizing: border-box; /* Include padding in height calculation */
+.save-btn:active {
+    background-color: #388E3C;
+    transform: scale(0.95);
 }

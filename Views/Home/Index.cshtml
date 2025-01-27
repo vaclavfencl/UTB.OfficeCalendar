@@ -9,25 +9,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
     <link rel="stylesheet" href="~/css/login.css" />
-    <script>
-        function login() {
-            const name = document.getElementById("nameInput").value.trim();
-
-            if (name === "Admin") {
-                window.location.href = "/Admin/AdminCalendar/AdminShared";
-            } else if (name === "User") {
-                window.location.href = "/User/Calendar/CalendarDay";
-            } else {
-                alert("Invalid name. Please enter 'Admin' or 'User'.");
-            }
-        }
-    </script>
 </head>
 <body>
-    <form onsubmit="event.preventDefault(); login();">
-        <input type="text" id="nameInput" placeholder="Name" required />
-        <input type="password" id="passwordInput" placeholder="Password" />
+    <form asp-action="Login" asp-controller="Home" method="post">
+        <input type="text" id="nameInput" name="Username" placeholder="Name" required />
+        <input type="password" id="passwordInput" name="Password" placeholder="Password" required />
         <button type="submit">Login</button>
     </form>
+
+    @if (ViewData["LoginFailed"] != null && (bool)ViewData["LoginFailed"])
+    {
+        <div id="error" style="color: red; margin-top:10px;">Nesprávné jméno či heslo</div>
+    }
 </body>
 </html>

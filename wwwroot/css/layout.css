@@ -1,8 +1,6 @@
 ﻿body {
     margin: 0;
     font-family: Arial, sans-serif;
-    display: flex;
-    height: 100vh;
 }
 
 .sidebar {
@@ -13,22 +11,33 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Align items and keep logout button at the bottom */
+    justify-content: space-between; 
+    position: fixed; 
+    top: 0;
+    height: 100vh; 
 }
 
 .profile {
     display: flex;
-    align-items: center; /* Align items horizontally */
+    align-items: center; 
     margin-bottom: 20px;
 }
 
 .profile-pic {
     width: 100px;
     height: 100px;
-    background-color: gray;
     border-radius: 50%;
-    margin-right: 5%; /* Space between image and text */
-    margin-left: 15%; /* Space between image and text */
+    overflow: hidden; 
+    margin-right: 5%;
+    margin-left: 15%;
+    background-color: gray;
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    border-radius: 50%;
 }
 
 .user-info {
@@ -73,13 +82,12 @@
         text-decoration: underline;
     }
 
-/* Add extra space between user and admin sections */
 .admin-section {
-    margin-top: 30px; /* Increase space between user and admin sections */
+    margin-top: 30px;
 }
 
 .logout-button {
-    background-color: #666; /* Match sidebar background */
+    background-color: #666;
     color: white;
     border: 2px solid white;
     border-radius: 5px;
@@ -87,20 +95,24 @@
     font-size: 16px;
     cursor: pointer;
     text-align: center;
-    margin-top: auto; /* Push the button to the bottom */
-    width: 80%; /* Center align by width and margin */
+    margin-top: auto;
+    width: 80%;
     margin-left: auto;
     margin-right: auto;
 }
 
     .logout-button:hover {
-        background-color: #444; /* Slightly darker */
+        background-color: #444;
         color: white;
     }
 
 .content {
-    width: 75%;
+    flex-grow: 1;
+    min-height: 100vh;
+    margin-left: 25%;
     padding: 20px;
     background-color: #ddd;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }

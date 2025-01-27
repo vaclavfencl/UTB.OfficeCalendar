@@ -1,0 +1,81 @@
+﻿@model List<UserDetailsViewModel>
+@using UTB.OfficeCalendar.Application.ViewModels
+@using UTB.OfficeCalendar.Infrastructure.Identity.Enum
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Výpis Uživatelů";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/listusers.css" />
+}
+
+<div class="title-bar">
+    <h1>Admin - Výpis uživatelů</h1>
+    <hr />
+</div>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.UserName</td>
+                <td>
+                    @if (user.Role == Roles.Admin)
+                    {
+                        @user.Role
+                    }
+                    else if (User.IsInRole("Admin")) // Only Admins can change roles
+                    {
+                        <form asp-action="ChangeRole" asp-controller="User" asp-area="Admin" method="post" style="display: inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <select name="newRole" class="form-select">
+                                @foreach (Roles role in Enum.GetValues(typeof(Roles)))
+                                {
+                                    if (role != Roles.Admin) // Prevent promoting to Admin
+                                    {
+                                        <option value="@role" selected="@(user.Role == role ? "selected" : null)">@role</option>
+                                    }
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary">Change</button>
+                        </form>
+                    }
+                    else
+                    {
+                        @user.Role
+                    }
+                </td>
+                <td>
+                    @if ((User.IsInRole("Admin") && user.Role != Roles.Admin) || (User.IsInRole("Manager") && user.Role == Roles.User))
+                    {
+                        <form asp-action="DeleteUser" asp-controller="User" asp-area="Admin" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+
+                        <form asp-action="ResetPassword" asp-controller="User" asp-area="Admin" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to reset this user\'s password?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <button type="submit" class="btn btn-sm btn-warning">Reset Password</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

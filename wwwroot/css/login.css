@@ -30,6 +30,7 @@ input {
 }
 
 button {
+    margin-bottom: 20px;
     background-color: gray;
     color: white;
     border: none;
@@ -39,6 +40,6 @@ button {
     border-radius: 5px;
 }
 
-    button:hover {
-        background-color: #444;
-    }
+button:hover {
+    background-color: #444;
+}

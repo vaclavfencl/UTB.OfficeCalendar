@@ -2,9 +2,13 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Vytvořit uživatele";
 }
+@model RegisterViewModel
 
 @section Styles {
     <link rel="stylesheet" href="~/css/createuser.css">
+}
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }
 
 <div class="main-content">
@@ -16,34 +20,49 @@
         </div>
 
         <!-- Create User Form -->
-        <form method="post" action="/Admin/CreateUser">
+        <form asp-area="Admin" asp-controller="User" asp-action="CreateUser" method="post">
             <div class="form-section">
                 <div class="form-row">
-                    <label class="form-label" for="name">Jméno <span class="mandatory">*</span>:</label>
-                    <input type="text" id="name" name="name" class="form-input" required>
+                    <label asp-for="UserName" class="form-label">Uživatelské jméno <span class="mandatory">*</span>:</label>
+                    <input asp-for="UserName" class="form-input" required>
                 </div>
                 <div class="form-row">
-                    <label class="form-label" for="surname">Příjmení <span class="mandatory">*</span>:</label>
-                    <input type="text" id="surname" name="surname" class="form-input" required>
+                    <label asp-for="FirstName" class="form-label">Jméno <span class="mandatory">*</span>:</label>
+                    <input asp-for="FirstName" class="form-input" required>
                 </div>
                 <div class="form-row">
-                    <label class="form-label" for="email">Email <span class="mandatory">*</span>:</label>
-                    <input type="email" id="email" name="email" class="form-input" required>
+                    <label asp-for="LastName" class="form-label">Příjmení <span class="mandatory">*</span>:</label>
+                    <input asp-for="LastName" class="form-input" required>
                 </div>
                 <div class="form-row">
-                    <label class="form-label" for="address">Adresa <span class="mandatory">*</span>:</label>
-                    <input type="text" id="address" name="address" class="form-input" required>
+                    <label asp-for="Email" class="form-label">Email <span class="mandatory">*</span>:</label>
+                    <input asp-for="Email" type="email" class="form-input" required>
                 </div>
                 <div class="form-row">
-                    <label class="form-label" for="phone">Telefonní číslo <span class="mandatory">*</span>:</label>
-                    <input type="text" id="phone" name="phone" class="form-input" required>
+                    <label asp-for="PhoneNumber" class="form-label">Telefonní číslo <span class="mandatory">*</span>:</label>
+                    <input asp-for="PhoneNumber" class="form-input" required>
+                </div>
+                <div class="form-row">
+                    <label asp-for="Password" class="form-label">Heslo <span class="mandatory">*</span>:</label>
+                    <input asp-for="Password" type="password" class="form-input" required>
                 </div>
             </div>
-
+            <!-- Error Messages Section -->
+            <div class="error-messages">
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li class="error-text">@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
             <!-- Action Buttons -->
             <div class="action-section">
                 <button type="submit" class="submit-btn">Vytvořit uživatele</button>
             </div>
         </form>
+
+        
+
     </div>
 </div>

@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using UTB.OfficeCalendar.Models;
+using Microsoft.AspNetCore.Authorization;
+using UTB.OfficeCalendar.Application.Abstraction;
+using UTB.OfficeCalendar.Application.ViewModels;
 
 namespace UTB.OfficeCalendar.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IAccountService _accountService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IAccountService accountService)
         {
-            _logger = logger;
+            _accountService = accountService;
         }
 
         public IActionResult Index()
@@ -18,11 +19,31 @@ namespace UTB.OfficeCalendar.Controllers
             return View();
         }
 
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel loginVM)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            if (ModelState.IsValid)
+            {
+                bool isLogged = await _accountService.Login(loginVM);
+                if (isLogged)
+                {
+                    return RedirectToAction("CalendarDay", "Calendar", new { area = "User" });
+                }
+
+                ViewData["LoginFailed"] = true;
+            }
+
+            return View("Index", loginVM);
         }
+
+
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await _accountService.Logout(); 
+            return RedirectToAction("Index"); 
+        }
+
+
     }
 }

@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@using UTB.OfficeCalendar.Application.Abstraction
+@using UTB.OfficeCalendar.Infrastructure.Identity.Enum
+@inject IAccountService UserService
+@using System.Security.Claims
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -10,15 +16,43 @@
     @RenderSection("Styles", required: false)
 </head>
 <body>
+    @{
+        string profilePicturePath = "img/default-profile.png"; // Default image
+        if (User.Identity.IsAuthenticated)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            profilePicturePath = await UserService.GetProfilePicturePath(userId) ?? "img/default-profile.png";
+        }
+    }
     <aside class="sidebar">
         <!-- User Profile Section -->
         <div class="profile">
-            <div class="profile-pic"></div> <!-- Gray circle as placeholder -->
+            <div class="profile-pic">
+                <img src="@Url.Content($"{profilePicturePath.Replace("\\", "/")}")" alt="Profile Picture" class="profile-img" />
+            </div>
             <div class="user-info">
-                <h3>Jméno Příjmení</h3>
-                <p>Role</p>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                    <h3>@await UserService.GetName(userId)</h3>
+
+                    @if (User.Identity.IsAuthenticated && User.IsInRole(nameof(Roles.Admin)))
+                    {
+                        <p>Admin</p>
+                    }
+                    else if (User.IsInRole(nameof(Roles.Manager)))
+                    {
+                        <p>Manager</p>
+                    } else
+                    {
+                        <p>User</p>
+                    }
+
+                }
+
             </div>
         </div>
+
         <!-- Navigation Links -->
         <h2>Tvůj účet</h2>
         <a asp-area="User" asp-controller="Calendar" asp-action="CalendarMonth">Měsíční kalendář</a>
@@ -26,14 +60,17 @@
         <a asp-area="User" asp-controller="Calendar" asp-action="SharedCalendar">Sdílený kalendář</a>
         <a asp-area="User" asp-controller="Profile" asp-action="Profile">Profil</a>
         <!-- Admin Menu -->
-        @* @if (User.IsInRole("Admin")) { *@
-        <h2>Admin zóna</h2>
-        <a asp-area="Admin" asp-controller="AdminCalendar" asp-action="AdminMonth">Měsíční kalendář</a>
-        <a asp-area="User" asp-controller="Calendar" asp-action="SharedCalendar">Sdílený kalendář</a>
-        @* <a asp-area="Admin" asp-controller="AdminCalendar" asp-action="AdminShared">Sdílený kalendář</a> *@
-        <a asp-area="Admin" asp-controller="User" asp-action="CreateUser">Vytvořit uživatele</a>
-        @* } *@
-        <button class="logout-button" onclick="location.href='/'">Logout</button>
+        @if (User.Identity.IsAuthenticated && User.IsInRole(nameof(Roles.Admin)) || User.IsInRole(nameof(Roles.Manager)))
+        {
+            <h2>Admin zóna</h2>
+            <a asp-area="Admin" asp-controller="AdminCalendar" asp-action="AdminMonth">Měsíční kalendář</a>
+            <a asp-area="Admin" asp-controller="User" asp-action="ListUser">Výpis uživatelů</a>
+            <a asp-area="Admin" asp-controller="User" asp-action="CreateUser">Vytvořit uživatele</a>
+        }
+
+
+        <!--  Vyřešit logout!!!!!  -->
+                <button class="logout-button" onclick="location.href='/'">Logout</button>
     </aside>
     <section class="content">
         @RenderBody()

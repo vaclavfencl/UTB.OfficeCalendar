@@ -2,6 +2,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml"; // Reference to the shared layout
     ViewData["Title"] = "Měsíční kalendář";
 }
+@using UTB.OfficeCalendar.Domain.Entities
 
 @section Styles {
     <link rel="stylesheet" href="~/css/calendarmonth.css">
@@ -12,47 +13,120 @@
         const currentMonthYear = document.getElementById('currentMonthYear');
         const calendarGrid = document.getElementById('calendarGrid');
         let currentDate = new Date();
+        let today = new Date().toISOString().split('T')[0]; // Get today’s date in YYYY-MM-DD format
 
-        function renderCalendar() {
+        async function fetchRequests(year, month) {
+            try {
+                const response = await fetch(`/User/Calendar/GetRequestsForMonth?year=${year}&month=${month}`);
+                if (!response.ok) throw new Error("Failed to fetch requests.");
+                const requests = await response.json();
+
+                let requestData = {};
+                requests.forEach(request => {
+                    requestData[request.date] = {
+                        accepted: request.accepted,
+                        pending: request.pending,
+                        requestId: request.requestId
+                    };
+                });
+
+                return requestData;
+            } catch (error) {
+                console.error("Error fetching requests:", error);
+                return {};
+            }
+        }
+
+        async function renderCalendar() {
             const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
             const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
             const daysInMonth = lastDay.getDate();
-
-            // Adjust start day to make Monday = 0
-            const startDayOfWeek = (firstDay.getDay() + 6) % 7; // Convert Sunday (0) to 6 and shift other days accordingly
-            const totalDays = 42; // Always 6 rows (42 days total for uniform grid)
+            const startDayOfWeek = (firstDay.getDay() + 6) % 7;
+            const totalDays = 42;
             calendarGrid.innerHTML = "";
 
-            // Update displayed month/year
             currentMonthYear.textContent = currentDate.toLocaleDateString('cs-CZ', {
                 month: 'long',
                 year: 'numeric'
             });
 
-            // Render calendar
+            const requestsData = await fetchRequests(currentDate.getFullYear(), currentDate.getMonth() + 1);
+
             for (let i = 0; i < totalDays; i++) {
                 const day = i - startDayOfWeek + 1;
                 const isCurrentMonth = day > 0 && day <= daysInMonth;
+                const dateString = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
 
                 const button = document.createElement('button');
                 button.className = isCurrentMonth ? 'day-button current-month' : 'day-button overflow-month';
                 button.textContent = isCurrentMonth ? day : (day <= 0 ? day + daysInMonth : day - daysInMonth);
-                button.onclick = () => openPopup(button.textContent);
+                button.dataset.date = dateString;
+
+                if (requestsData[dateString]) {
+                    if (requestsData[dateString].accepted) {
+                        button.classList.add("accepted");
+                    } else if (requestsData[dateString].pending) {
+                        button.classList.add("pending");
+                    }
+                    button.dataset.requestId = requestsData[dateString].requestId;
+                }
+
+                // 🚫 Disable past dates including today
+                if (dateString <= today) {
+                    button.classList.add("disabled");
+                    button.onclick = null;
+                } else {
+                    button.onclick = () => handlePopup(button);
+                }
 
                 calendarGrid.appendChild(button);
             }
         }
 
-        function openPopup(day) {
-            const popup = document.getElementById('popup');
-            const popupDay = document.getElementById('popupDay');
-            popupDay.textContent = `Den: ${day}`;
-            popup.style.display = 'flex';
+        function handlePopup(button) {
+            const date = button.dataset.date;
+            const requestId = button.dataset.requestId;
+
+            // 🚫 Prevent popups on past & current dates
+            if (date <= today) {
+                return;
+            }
+
+            if (button.classList.contains("accepted") || button.classList.contains("pending")) {
+                openCancelPopup(date, requestId);
+            } else {
+                openRequestPopup(date);
+            }
         }
 
-        function closePopup() {
-            const popup = document.getElementById('popup');
-            popup.style.display = 'none';
+        function openRequestPopup(date) {
+            document.getElementById("popupRequestDay").textContent = `Den: ${date}`;
+            document.getElementById("popupRequestDate").value = date;
+            document.getElementById("popupRequest").style.display = "flex";
+        }
+
+        function openCancelPopup(date, requestId) {
+            document.getElementById("popupCancelDay").textContent = `Den: ${date}`;
+            document.getElementById("popupCancelButton").setAttribute("onclick", `deleteRequest(${requestId})`);
+            document.getElementById("popupCancel").style.display = "flex";
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).style.display = "none";
+        }
+
+        async function deleteRequest(requestId) {
+            try {
+                const response = await fetch(`/User/Calendar/DeleteRequest/${requestId}`, { method: 'DELETE' });
+                if (response.ok) {
+                    await renderCalendar();
+                    closePopup("popupCancel");
+                } else {
+                    alert("Chyba při odmítání práce.");
+                }
+            } catch (error) {
+                console.error("Error deleting request:", error);
+            }
         }
 
         function prevMonth() {
@@ -65,26 +139,23 @@
             renderCalendar();
         }
 
-        // Initialize calendar
         document.addEventListener('DOMContentLoaded', renderCalendar);
     </script>
 }
 
+
 <div class="calendar-container">
-    <!-- Title -->
     <div class="title-bar">
         <h1>Měsíční kalendář</h1>
         <hr />
     </div>
 
-    <!-- Navigation Bar -->
     <div class="nav-bar">
         <button class="nav-button" onclick="prevMonth()">&larr;</button>
         <span id="currentMonthYear"></span>
         <button class="nav-button" onclick="nextMonth()">&rarr;</button>
     </div>
 
-    <!-- Day Shortcuts -->
     <div class="day-shortcuts">
         <span>Po</span>
         <span>Út</span>
@@ -95,16 +166,27 @@
         <span>Ne</span>
     </div>
 
-    <!-- Calendar Grid -->
     <div id="calendarGrid" class="calendar-grid"></div>
 </div>
 
-<!-- Popup -->
-<div id="popup" class="popup">
+<!-- Request Job Popup -->
+<div id="popupRequest" class="popup">
     <div class="popup-content">
-        <p id="popupDay"></p>
-        <button class="popup-button" onclick="closePopup()">I want to work</button>
-        <button class="popup-button" onclick="closePopup()">I can't work</button>
-        <button class="popup-button close" onclick="closePopup()">Close</button>
+        <p id="popupRequestDay"></p>
+        <form method="post" asp-action="CreateRequest" asp-controller="Calendar">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="selectedDate" id="popupRequestDate" />
+            <button type="submit" class="popup-button">Přihlášení na práci</button>
+        </form>
+        <button class="popup-button close" onclick="closePopup('popupRequest')">Zavřít</button>
+    </div>
+</div>
+
+<!-- Cancel Job Popup -->
+<div id="popupCancel" class="popup">
+    <div class="popup-content">
+        <p id="popupCancelDay"></p>
+        <button id="popupCancelButton" class="popup-button reject">Odmítnout práci</button>
+        <button class="popup-button close" onclick="closePopup('popupCancel')">Zavřít</button>
     </div>
 </div>

@@ -1,20 +1,26 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml"; // Reference to the shared layout
+﻿@model UTB.OfficeCalendar.Application.ViewModels.CalendarViewModel;
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Denní kalendář";
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/calendarday.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"> <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 }
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> <!-- Flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         const currentDateElement = document.getElementById('currentDate');
         const datePicker = document.getElementById('datePicker');
-        let currentDate = new Date();
-
+        let currentDate = new Date("@Model.CurrentDate.ToString("yyyy-MM-ddTHH:mm:ss")");
+        function formatDateToISO(date) {
+            return date.getFullYear() + "-" +
+                String(date.getMonth() + 1).padStart(2, '0') + "-" +
+                String(date.getDate()).padStart(2, '0');
+        }
         function updateDateDisplay() {
             currentDateElement.textContent = currentDate.toLocaleDateString('cs-CZ', {
                 day: 'numeric',
@@ -29,7 +35,7 @@
                 onChange: function (selectedDates) {
                     if (selectedDates.length > 0) {
                         currentDate = selectedDates[0];
-                        updateDateDisplay();
+                        window.location.href = `?date=${formatDateToISO(currentDate)}`;
                     }
                 }
             }).open();
@@ -37,12 +43,12 @@
 
         function prevDay() {
             currentDate.setDate(currentDate.getDate() - 1);
-            updateDateDisplay();
+            window.location.href = `?date=${formatDateToISO(currentDate)}`;
         }
 
         function nextDay() {
             currentDate.setDate(currentDate.getDate() + 1);
-            updateDateDisplay();
+            window.location.href = `?date=${formatDateToISO(currentDate)}`;
         }
 
         document.addEventListener("DOMContentLoaded", updateDateDisplay);
@@ -59,7 +65,7 @@
     <!-- Navigation Bar -->
     <div class="nav-bar">
         <button class="nav-button" onclick="prevDay()">&larr;</button>
-        <span id="currentDate" onclick="openCalendar()">Den měsíc rok</span>
+        <span id="currentDate" onclick="openCalendar()">@Model.CurrentDate.ToString("d. MMMM yyyy")</span>
         <input id="datePicker" type="text" style="display: none;" />
         <button class="nav-button" onclick="nextDay()">&rarr;</button>
     </div>
@@ -71,10 +77,22 @@
             <span class="header-cell">Čas</span>
             <span class="header-cell">Detail</span>
         </div>
-        <div class="event-row">
-            <span class="event-cell">Práce</span>
-            <span class="event-cell">17:00</span>
-            <span class="event-cell">Pracující práce pro pracanta</span>
-        </div>
+        @if (Model.Events != null && Model.Events.Count > 0)
+        {
+            foreach (var ev in Model.Events)
+            {
+                <div class="event-row">
+                    <span class="event-cell">@ev.Title</span>
+                    <span class="event-cell">@ev.TimeStart.ToString("HH:mm") - @ev.TimeEnd.ToString("HH:mm")</span>
+                    <span class="event-cell">@ev.Description</span>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="event-row">
+                <span class="event-cell" colspan="3">Žádné události pro tento den.</span>
+            </div>
+        }
     </div>
 </div>

@@ -1,35 +1,259 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml"; // Reference to the shared layout
+﻿@model UTB.OfficeCalendar.Application.ViewModels.CalendarViewModel;
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Sdílený kalendář";
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/calendarshared.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"> <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 }
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> <!-- Flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <script>
         const currentDateElement = document.getElementById('currentDate');
-        const datePicker = document.getElementById('datePicker');
-        let currentDate = new Date();
+        let currentDate = new Date("@Model.CurrentDate.ToString("yyyy-MM-ddTHH:mm:ss")");
+
+        function showEventPopup(title, description) {
+            if (!title || title === 'null') return;
+            document.getElementById("eventTitle").textContent = title;
+            document.getElementById("eventDescription").textContent = description || "No description provided.";
+            document.getElementById("eventPopup").style.display = "block";
+        }
+
+        function closeEventPopup() {
+            document.getElementById("eventPopup").style.display = "none";
+        }
+
+        const userRole = "@ViewData["UserRole"]"; // Retrieve user role from Razor
+
+        function handleCellClick(date, hour, hasEvent, eventId, title, description, userId) {
+            if (hasEvent === 'True') {
+                if (userRole === "Admin" || userRole === "Manager") {
+                    openEditEventPopup(eventId, title, description, date, `${hour.toString().padStart(2, '0')}:00`, `${(hour + 1).toString().padStart(2, '0')}:00`);
+                } else {
+                    showEventPopup(title, description);
+                }
+            } else if (userRole === "Admin") {
+                openCreateEventPopup(date, hour);
+            }
+        }
+
+        function openEditEventPopup(eventId, title, description, date, startTime, endTime) {
+            document.getElementById("editEventId").value = eventId;
+            document.getElementById("editEventTitle").value = title || "";
+            document.getElementById("editEventDescription").value = description || "";
+            document.getElementById("editEventDate").value = date || "";
+            document.getElementById("editEventStart").value = startTime || "";
+            document.getElementById("editEventEnd").value = endTime || "";
+
+            // Fetch the userId dynamically by requesting the event details
+            fetch(`/User/Calendar/GetEvent/${eventId}`)
+                .then(response => response.json())
+                .then(eventData => {
+                    const userDropdown = document.getElementById("editEventUser");
+                    userDropdown.innerHTML = ""; // Clear previous options
+
+                    fetch(`/User/Calendar/GetAvailableUsersForDate?date=${date}`)
+                        .then(response => response.json())
+                        .then(users => {
+                            users.forEach(user => {
+                                let option = document.createElement("option");
+                                option.value = user.userId;
+                                option.textContent = user.userName;
+                                if (user.userId == eventData.userId) {
+                                    option.selected = true;
+                                }
+                                userDropdown.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error('Error fetching users:', error));
+                })
+                .catch(error => console.error('Error fetching event details:', error));
+
+            document.getElementById("editEventPopup").style.display = "block";
+        }
+
+
+        function openCreateEventPopup(date, hour, selectedUserName) {
+            document.getElementById("eventDate").value = date;
+            document.getElementById("eventStart").value = `${hour.toString().padStart(2, '0')}:00`;
+
+            document.getElementById("eventEnd").value = `${hour.toString().padStart(2, '0')}:00`;
+
+            document.getElementById("eventUser").innerHTML = ""; // Clear previous options
+
+            fetch(`/User/Calendar/GetAvailableUsersForDate?date=${date}`)
+                .then(response => response.json())
+                .then(users => {
+                    console.log("Users fetched:", users);
+
+                    if (users.length === 0) {
+                        console.warn("No available users for this date.");
+                    }
+
+                    users.forEach(user => {
+                        let option = document.createElement("option");
+                        option.value = user.userId;
+                        option.textContent = user.userName;
+                        if (user.userName === selectedUserName) {
+                            option.selected = true;
+                        }
+                        document.getElementById("eventUser").appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching users:', error));
+
+            document.getElementById("createEventPopup").style.display = "block";
+        }
+
+        function showEventPopup(title, description) {
+            if (!title || title === 'null') return;
+            document.getElementById("eventTitle").textContent = title;
+            document.getElementById("eventDescription").textContent = description || "No description provided.";
+            document.getElementById("eventPopup").style.display = "block";
+        }
+
+        function deleteEvent() {
+            const eventId = document.getElementById("editEventId").value;
+
+            if (!eventId) {
+                alert("No event selected.");
+                return;
+            }
+
+            if (!confirm("Are you sure you want to delete this event?")) {
+                return;
+            }
+
+            fetch(`/User/Calendar/DeleteEvent/${eventId}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Event deleted successfully.");
+                        location.reload(); // Refresh the calendar
+                    } else {
+                        alert("Failed to delete event.");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+
+        function submitEditEvent() {
+            const eventId = document.getElementById("editEventId").value;
+            const title = document.getElementById("editEventTitle").value;
+            const description = document.getElementById("editEventDescription").value;
+            const date = document.getElementById("editEventDate").value;
+            const startTime = document.getElementById("editEventStart").value;
+            const endTime = document.getElementById("editEventEnd").value;
+            const userId = document.getElementById("editEventUser").value;
+
+            if (!title || !date || !startTime || !endTime || !userId) {
+                alert("All fields must be filled out.");
+                return;
+            }
+
+            if (startTime >= endTime) {
+                alert("End time must be later than start time.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("Id", eventId);
+            formData.append("Title", title);
+            formData.append("Description", description);
+            formData.append("DateOfJob", date);
+            formData.append("TimeStart", startTime);
+            formData.append("TimeEnd", endTime);
+            formData.append("UserId", userId);
+
+            fetch(`/User/Calendar/EditEvent/${eventId}`, {
+                method: 'PUT',
+                body: formData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Event updated successfully.");
+                        location.reload(); // Refresh the calendar
+                    } else {
+                        alert("Failed to update the event.");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function closeCreateEventPopup() {
+            document.getElementById("createEventPopup").style.display = "none";
+        }
+
+        function closeEditEventPopup() {
+            document.getElementById("editEventPopup").style.display = "none";
+        }
+
+        function validateTime() {
+            const start = document.getElementById("eventStart").value;
+            const end = document.getElementById("eventEnd").value;
+            if (start && end && start >= end) {
+                alert("End time must be later than start time.");
+                document.getElementById("eventEnd").value = "";
+            }
+        }
+
+        function submitEvent() {
+            const userDropdown = document.getElementById("eventUser");
+            const userId = userDropdown.value;
+
+            if (!userId) {
+                alert("Please select a user.");
+                return;
+            }
+
+            const start = document.getElementById("eventStart").value;
+            const end = document.getElementById("eventEnd").value;
+
+            const startTime = new Date(`2000-01-01T${start}:00`);
+            const endTime = new Date(`2000-01-01T${end}:00`);
+
+            if (!start || !end || endTime <= startTime) {
+                alert("Please enter a valid start and end time.");
+                return;
+            }
+
+            const formData = new FormData(document.getElementById("createEventForm"));
+
+            fetch('/User/Calendar/CreateEvent', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (response.ok) location.reload();
+                    else alert("Failed to create event.");
+                })
+                .catch(error => console.error('Error:', error));
+        }
 
         function updateDateDisplay() {
-            currentDateElement.textContent = currentDate.toLocaleDateString('cs-CZ', {
+            document.getElementById('currentDate').textContent = new Date("@Model.CurrentDate.ToString("yyyy-MM-ddTHH:mm:ss")").toLocaleDateString('cs-CZ', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric'
             });
         }
-
+        function formatDateToISO(date) {
+            return date.getFullYear() + "-" +
+                String(date.getMonth() + 1).padStart(2, '0') + "-" +
+                String(date.getDate()).padStart(2, '0');
+        }
         function openCalendar() {
             flatpickr(datePicker, {
                 defaultDate: currentDate,
                 onChange: function (selectedDates) {
                     if (selectedDates.length > 0) {
                         currentDate = selectedDates[0];
-                        updateDateDisplay();
+                        window.location.href = `?date=${formatDateToISO(currentDate)}`;
                     }
                 }
             }).open();
@@ -37,12 +261,12 @@
 
         function prevDay() {
             currentDate.setDate(currentDate.getDate() - 1);
-            updateDateDisplay();
+            window.location.href = `?date=${formatDateToISO(currentDate)}`;
         }
 
         function nextDay() {
             currentDate.setDate(currentDate.getDate() + 1);
-            updateDateDisplay();
+            window.location.href = `?date=${formatDateToISO(currentDate)}`;
         }
 
         document.addEventListener("DOMContentLoaded", updateDateDisplay);
@@ -50,60 +274,117 @@
 }
 
 <div class="calendar-container">
-    <!-- Title -->
     <div class="title-bar">
         <h1>Sdílený kalendář</h1>
         <hr />
     </div>
 
-    <!-- Navigation Bar -->
     <div class="nav-bar">
         <button class="nav-button" onclick="prevDay()">&larr;</button>
-        <span id="currentDate" onclick="openCalendar()">Den měsíc rok</span>
+        <span id="currentDate" onclick="openCalendar()">@Model.CurrentDate.ToString("d. MMMM yyyy")</span>
         <input id="datePicker" type="text" style="display: none;" />
         <button class="nav-button" onclick="nextDay()">&rarr;</button>
     </div>
 
-    <!-- Calendar Table -->
     <div class="calendar-table">
-        <!-- Header Row -->
         <div class="header-row">
             <span class="header-cell">Uživatel</span>
-            <span class="header-cell">8:00</span>
-            <span class="header-cell">9:00</span>
-            <span class="header-cell">10:00</span>
-            <span class="header-cell">11:00</span>
-            <span class="header-cell">12:00</span>
-            <span class="header-cell">13:00</span>
-            <span class="header-cell">14:00</span>
-            <span class="header-cell">15:00</span>
-            <span class="header-cell">16:00</span>
+            @for (var hour = 8; hour <= 16; hour++)
+            {
+                <span class="header-cell">@hour:00</span>
+            }
         </div>
 
-        <!-- User Rows -->
-        <div class="user-row">
-            <span class="user-cell">Admin</span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-        </div>
-        <div class="user-row">
-            <span class="user-cell">User</span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
-            <span class="time-cell"></span>
+        @foreach (var user in Model.SharedUserEvents)
+        {
+            <div class="user-row">
+                <span class="user-cell">@user.UserName</span>
+                @for (var hour = 8; hour <= 16; hour++)
+                {
+                    var eventAtHour = user.Events.FirstOrDefault(e => e.TimeStart.Hour == hour);
+                    <span class="time-cell"
+                                  onclick="handleCellClick('@Model.CurrentDate.ToString("yyyy-MM-dd")', '@hour', '@(eventAtHour != null)', '@(eventAtHour?.Id ?? 0)', '@eventAtHour?.Title', '@eventAtHour?.Description', '@eventAtHour?.DateOfJob', '@eventAtHour?.TimeStart', '@eventAtHour?.TimeEnd')">
+                        @(eventAtHour?.Title ?? "")
+                    </span>
+                }
+            </div>
+        }
+
+    </div>
+
+    <!-- Event Popup -->
+    <div id="eventPopup" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeEventPopup()">&times;</span>
+            <h2 id="eventTitle"></h2>
+            <p id="eventDescription"></p>
         </div>
     </div>
+
+    <!-- Event Creation Modal -->
+    @if (ViewData["UserRole"]?.ToString() == "Admin")
+    {
+        <div id="createEventPopup" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeCreateEventPopup()">&times;</span>
+                <h2>Create Event</h2>
+                <form id="createEventForm" method="post" enctype="multipart/form-data">
+                    <label for="eventTitle">Title:</label>
+                    <input type="text" id="eventTitle" name="Title" required><br><br>
+
+                    <label for="eventUser">User:</label>
+                    <select id="eventUser" name="UserId" required></select><br><br>
+
+                    <label for="eventDescription">Description:</label>
+                    <textarea id="eventDescription" name="Description"></textarea><br><br>
+
+                    <label for="eventDate">Date:</label>
+                    <input type="date" id="eventDate" name="DateOfJob" required><br><br>
+
+                    <label for="eventStart">Start Time:</label>
+                    <input type="time" id="eventStart" name="TimeStart" required><br><br>
+
+                    <label for="eventEnd">End Time:</label>
+                    <input type="time" id="eventEnd" name="TimeEnd" required><br><br>
+
+                    <button type="button" onclick="submitEvent()">Create Event</button>
+                </form>
+            </div>
+        </div>
+    }
+    <!-- Edit Event Popup -->
+    @if (ViewData["UserRole"]?.ToString() == "Admin" || ViewData["UserRole"]?.ToString() == "Manager")
+    {
+        <div id="editEventPopup" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeEditEventPopup()">&times;</span>
+                <h2>Edit Event</h2>
+                <form id="editEventForm" method="post">
+                    <input type="hidden" id="editEventId" name="Id">
+
+                    <label for="editEventTitle">Title:</label>
+                    <input type="text" id="editEventTitle" name="Title" required><br><br>
+
+                    <label for="editEventUser">User:</label>
+                    <select id="editEventUser" name="UserId" required></select><br><br>
+
+                    <label for="editEventDescription">Description:</label>
+                    <textarea id="editEventDescription" name="Description"></textarea><br><br>
+
+                    <label for="editEventDate">Date:</label>
+                    <input type="date" id="editEventDate" name="DateOfJob" required><br><br>
+
+                    <label for="editEventStart">Start Time:</label>
+                    <input type="time" id="editEventStart" name="TimeStart" required><br><br>
+
+                    <label for="editEventEnd">End Time:</label>
+                    <input type="time" id="editEventEnd" name="TimeEnd" required><br><br>
+
+                    <button type="button" onclick="submitEditEvent()">Save Changes</button>
+                    <button type="button" onclick="deleteEvent()">Delete Event</button>
+                </form>
+            </div>
+        </div>
+    }
+
 </div>

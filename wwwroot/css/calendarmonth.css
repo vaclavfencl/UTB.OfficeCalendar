@@ -69,8 +69,6 @@
 }
 
 .day-button {
-    background-color: #444;
-    color: #fff;
     padding: 20px;
     border: none;
     border-radius: 5px;
@@ -91,6 +89,18 @@
     .day-button:hover {
         background-color: #666;
     }
+
+    .day-button.pending {
+        background-color: #cd6e00 !important;
+        color: black !important;
+    }
+
+    .day-button.accepted {
+        background-color: #22e90e !important;
+        color: white !important;
+    }
+    
+
 
 /* Popup */
 .popup {
@@ -139,3 +149,4 @@
     .popup-button.close {
         background-color: #222; /* Slightly darker for the close button */
     }
+
